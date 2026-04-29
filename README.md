@@ -1,45 +1,67 @@
-# x2.email - DIY Disposable Email Service using Cloudflare
-`x2.email` is a minimalistic app for managing disposable emails ("Custom addresses") in Cloudflare. Protect your inbox from the onslaught of unwanted junk emails and take control of your email privacy.
+# nomail
 
-## 📌 Problem Statement
-Your email address serves as a universal key to numerous online services. Every new service you sign up for brings with it a deluge of promotional junk. Not to mention the lurking risk of data breaches, which may expose your email on the darknet.
-See my rant about promotional junk emails: [LINK](https://jessetinell.com/diy-disposable-email-service-using-cloudflare)
+A minimalistic UI for managing disposable email aliases on Cloudflare Email Routing. Connect one or more Cloudflare zones, generate aliases with random suffixes, and forward everything to your real inbox.
 
-## 🌟 Solution
-The easiest way to stop receiving junk emails is to not share you email address to begin with. Not share your *real* email address, at least.
-Instead, you can use disposable emails. One new address for each online service.
-With Cloudflare Email Routing you can create free disposable emails that forward emails straight to your primary inbox (Gmail, Outlook, Apple Mail, etc.).
-`x2.email`is a minimalistic app for managing of your disposable emails in Cloudflare.
+This project is a fork of [x2.email](https://github.com/jessetinell/x2.email) by [Jesse Tinell](https://github.com/jessetinell). Thanks to him for the original work. This fork rebuilds the UI on shadcn/ui and adds multi-domain support, configurable random suffixes, dark mode and a refreshed design.
 
-## 🚀 Features
-- **Sleek Interface:** A minimalistic UI. 13x faster than using Cloudflare's dashboard.
-- **Privacy First:** No registration, no personal info sharing.
-- **Direct Communication:** x2.email communicates directly with the Cloudflare API. `x2.email` has no database or server.
-- **Open Source Goodness:** Host the application yourself for free (optional) or modify the code to your liking. Don't forget to star the repo!
+## Features
 
-## 🧰 Getting Started
+- **Multi-domain.** Connect multiple Cloudflare accounts and zones, switch between them from the header, or view aliases across all of them at once.
+- **Unguessable aliases.** Every new alias gets a random suffix (`service-a1b2c3@yourdomain.com`) so a leaked address can be revoked without losing the service name. Suffix length is configurable from 3 to 10 characters.
+- **Search.** Quick text search across alias, destination and domain.
+- **Light / dark / system theme.** `next-themes` with shadcn neutral palette and a purple accent.
+- **No backend.** Credentials are encrypted and stored locally in your browser. No accounts, no database, no analytics.
+- **Talks to Cloudflare directly** through a thin proxy that forwards requests verbatim to the Cloudflare API.
 
-### Prerequisites:
-1. Cloudflare® account
-2. A domain connected to Cloudflare®
+## Tech stack
 
-### Use the app:
-You can choose to use the hosted version, **[x2.email](https://x2.email)**, or host the application yourself:
+- Next.js 14 (App Router)
+- React 18 + TypeScript
+- Tailwind CSS v4
+- shadcn/ui (built on [Base UI](https://base-ui.com))
+- lucide-react, sonner, next-themes
+- Cloudflare Email Routing API
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjessetinell%2Fx2.email)
+## Getting started
 
+### Prerequisites
 
-## 📖 About
-x2.email was created with the mission to safeguard your primary email inbox. Built on top of Cloudflare's Email Routing service, it serves as an intermediary, ensuring your primary email remains pristine.
+1. A Cloudflare account
+2. A domain connected to Cloudflare with [Email Routing](https://developers.cloudflare.com/email-routing/) enabled
+3. A Cloudflare API token with the following permissions:
+   - **Account** → Email Routing Addresses → Read
+   - **Zone** → Email Routing Rules → Edit
+   - **Zone** → Zone Settings → Read
 
-## 🛠 Contributing
-We welcome contributions to improve `x2.email`. Feel free to raise issues, provide solutions, or suggest new features.
+### Run locally
 
-### Develop locally
-1. `npm i`
-2. `npm run dev`
-3. Open [http://localhost:3000](http://localhost:3000)
+```bash
+npm install
+npm run dev
+```
 
+Open [http://localhost:3000](http://localhost:3000) and paste your Account ID, Zone ID and API token. Both regular and "Quick auth" (comma-separated) entry are supported.
 
-## 📜 License
-This project is licensed under the MIT License.
+### Deploy
+
+The app is a standard Next.js 14 project. Build with `npm run build` and serve with `npm start`, or deploy to any host that supports Next.js.
+
+## Project layout
+
+```
+src/
+├── app/                 Next.js routes (login, /app, /faq, /settings, /login/cloudflare)
+├── components/          App components (Header, Footer, AliasDialog, ...)
+│   └── ui/              shadcn primitives
+├── context/             React contexts (User, Cloudflare, Settings)
+├── services/cloudflare/ Cloudflare API client + types
+└── utils/               Encryption helpers and shared utilities
+```
+
+## Contributing
+
+Issues and PRs welcome. Run `npx tsc --noEmit` before opening a PR.
+
+## License
+
+MIT, same as the upstream project.
