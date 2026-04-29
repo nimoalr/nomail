@@ -1,13 +1,16 @@
 "use client"
-import { Container } from '@chakra-ui/react'
-import CloudflareEmailRouterSettings from '@/components/CloudflareEmailRouterSettings'
+import CloudflareEmailRouterSettings from "@/components/CloudflareEmailRouterSettings";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function Page() {
-  return (
-    <main>
-      <Container maxW={700} pt={8}>
-        <CloudflareEmailRouterSettings />
-      </Container>
-    </main>
-  )
+    return (
+        <div className="flex min-h-svh flex-col">
+            <Header />
+            <main className="mx-auto w-full max-w-4xl flex-1 px-4 pt-8 pb-16 md:px-6">
+                <CloudflareEmailRouterSettings />
+            </main>
+            <Footer />
+        </div>
+    );
 }

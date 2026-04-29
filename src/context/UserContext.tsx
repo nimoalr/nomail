@@ -1,135 +1,182 @@
 "use client"
-import React, { useEffect, useState } from 'react';
-import encryption from '@/utils/encryption';
-import { CloudflareApiClient } from '@/services/cloudflare';
-import { CloudflareListEmailDestinationsResponse } from '@/services/cloudflare/cloudflare.types';
+import React, { useEffect, useMemo, useState } from "react";
+import encryption from "@/utils/encryption";
+import { CloudflareApiClient } from "@/services/cloudflare";
+import { CloudflareListEmailDestinationsResponse } from "@/services/cloudflare/cloudflare.types";
 
-const LOCAL_STORAGE_ACCOUNT_ID = "x2-email-cloudflare_account_identifier";
-const LOCAL_STORAGE_ZONE_ID = "x2-email-cloudflare_zone_identifier";
-const LOCAL_STORAGE_ACCESS_TOKEN = "x2-email-cloudflare_access_token";
+const STORAGE_CONNECTIONS = "nomail.connections";
+const STORAGE_ACTIVE = "nomail.activeConnectionId";
 
-export const UserContext = React.createContext({
+export interface Connection {
+    id: string;
+    accountId: string;
+    zoneId: string;
+    accessToken: string;
+    domain: string;
+    destinationAddresses: string[];
+}
 
-  isAuthenticated: false,
-  isLoading: false,
+export type ActiveSelection = string | "all" | null;
 
-  accountId: "",
-  zoneId: "",
-  accessToken: "",
+interface UserContextValue {
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    connections: Connection[];
+    activeId: ActiveSelection;
+    activeConnection: Connection | null;
+    isAllMode: boolean;
 
-  destinationAddresses: [] as string[],
-  domain: "",
+    accountId: string;
+    zoneId: string;
+    accessToken: string;
+    domain: string;
+    destinationAddresses: string[];
 
-  authorize: (accountId: string, zoneId: string, accessToken: string) => { },
-  clearAllValues: () => { }
+    addConnection: (accountId: string, zoneId: string, accessToken: string) => Promise<boolean>;
+    removeConnection: (id: string) => void;
+    setActive: (id: ActiveSelection) => void;
+    clearAllValues: () => void;
+}
 
+export const UserContext = React.createContext<UserContextValue>({
+    isAuthenticated: false,
+    isLoading: false,
+    connections: [],
+    activeId: null,
+    activeConnection: null,
+    isAllMode: false,
+    accountId: "",
+    zoneId: "",
+    accessToken: "",
+    domain: "",
+    destinationAddresses: [],
+    addConnection: async () => false,
+    removeConnection: () => { },
+    setActive: () => { },
+    clearAllValues: () => { },
 });
 
-export function UserProvider({ children }: any) {
+function uuid() {
+    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
-  const [accountId, setAccountId] = useState<string>("");
-  const [zoneId, setZoneId] = useState<string>("");
-  const [accessToken, setAccessToken] = useState<string>("");
-  const [domain, setDomain] = useState<string>("");
-  const [destinationAddresses, setDestinationAddresses] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  const fetchInitialData = async (accountId: string, zoneId: string, accessToken: string): Promise<boolean> => {
-
-    setIsLoading(true);
-
+async function fetchConnectionInfo(
+    accountId: string,
+    zoneId: string,
+    accessToken: string
+): Promise<{ domain: string; destinationAddresses: string[] } | null> {
     const apiClient = new CloudflareApiClient(accessToken);
-
-    // Fetch the domain. This domain is used to create aliases.
-    // const routingResponse = await CloudflareService.get(`/zones/${zoneId}/email/routing`, accessToken)
     const routingResponse = await apiClient.getEmailRouting(zoneId);
+    if (!routingResponse.success) return null;
 
-    if (routingResponse.success) {
-      setDomain(routingResponse.result.name);
-    }
+    const destResponse: CloudflareListEmailDestinationsResponse =
+        await apiClient.getDestinations(accountId);
 
+    return {
+        domain: routingResponse.result.name,
+        destinationAddresses: destResponse.result?.map((r: any) => r.email) || [],
+    };
+}
 
-    // Fetch the destination addresses. Emails will be forwarded to these addresses.
-    const destinationAddressesResponse: CloudflareListEmailDestinationsResponse = await apiClient.getDestinations(accountId);
+export function UserProvider({ children }: any) {
+    const [connections, setConnections] = useState<Connection[]>([]);
+    const [activeId, setActiveIdState] = useState<ActiveSelection>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    if (routingResponse.success) {
-      setDestinationAddresses(destinationAddressesResponse.result?.map((result: any) => result.email) || [])
-    }
-
-    setIsLoading(false);
-
-    return routingResponse.success && destinationAddressesResponse.success;
-
-  }
-
-  useEffect(() => {
-
-    async function checkIfAuthenticated() {
-
-      // Get decrypted data from Local Storage on the client-side and set the state
-      const decryptedAccountId = encryption.getItem(LOCAL_STORAGE_ACCOUNT_ID);
-      const decryptedZoneId = encryption.getItem(LOCAL_STORAGE_ZONE_ID);
-      const decryptedAccessToken = encryption.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
-
-      if (decryptedAccountId && decryptedZoneId && decryptedAccessToken) {
-
-        fetchInitialData(decryptedAccountId, decryptedZoneId, decryptedAccessToken)
-
-        setAccountId(decryptedAccountId || "");
-        setZoneId(decryptedZoneId || "");
-        setAccessToken(decryptedAccessToken || "");
-        setIsAuthenticated(true);
-
-      }
-    }
-
-    checkIfAuthenticated();
-
-  }, []);
-
-  return (
-    <UserContext.Provider value={{
-
-      isLoading,
-      isAuthenticated,
-
-      accountId,
-      zoneId,
-      accessToken,
-
-      domain,
-      destinationAddresses,
-
-      authorize: async (accountId, zoneId, accessToken) => {
-
-        // Fetch initial data
-        const success = await fetchInitialData(accountId, zoneId, accessToken);
-
-        if (success) {
-          setAccountId(accountId);
-          setZoneId(zoneId);
-          setAccessToken(accessToken);
-          setIsAuthenticated(true);
-
-          // Save encrypted data to Local Storage on the client-side
-          encryption.setItem(LOCAL_STORAGE_ACCOUNT_ID, accountId);
-          encryption.setItem(LOCAL_STORAGE_ZONE_ID, zoneId);
-          encryption.setItem(LOCAL_STORAGE_ACCESS_TOKEN, accessToken);
+    useEffect(() => {
+        const stored: Connection[] = encryption.getItem(STORAGE_CONNECTIONS) || [];
+        if (Array.isArray(stored) && stored.length > 0) {
+            setConnections(stored);
+            const savedActive = localStorage.getItem(STORAGE_ACTIVE);
+            if (savedActive === "all" || stored.some((c) => c.id === savedActive)) {
+                setActiveIdState(savedActive as ActiveSelection);
+            } else {
+                setActiveIdState(stored[0].id);
+            }
         }
+    }, []);
 
-      },
-      clearAllValues: () => {
-        setIsAuthenticated(false)
-        setAccessToken("")
-        setZoneId("")
-        setAccountId("")
-        setDomain("")
-        setDestinationAddresses([])
-      }
+    const persist = (next: Connection[]) => {
+        encryption.setItem(STORAGE_CONNECTIONS, next);
+    };
 
-    }}>
-      {children}
-    </UserContext.Provider>
-  )
+    const setActive = (id: ActiveSelection) => {
+        setActiveIdState(id);
+        if (id) localStorage.setItem(STORAGE_ACTIVE, id);
+        else localStorage.removeItem(STORAGE_ACTIVE);
+    };
+
+    const addConnection = async (accountId: string, zoneId: string, accessToken: string) => {
+        setIsLoading(true);
+        try {
+            const existing = connections.find((c) => c.zoneId === zoneId);
+            if (existing) {
+                setActive(existing.id);
+                return true;
+            }
+
+            const info = await fetchConnectionInfo(accountId, zoneId, accessToken);
+            if (!info) return false;
+
+            const conn: Connection = {
+                id: uuid(),
+                accountId,
+                zoneId,
+                accessToken,
+                domain: info.domain,
+                destinationAddresses: info.destinationAddresses,
+            };
+            const next = [...connections, conn];
+            setConnections(next);
+            persist(next);
+            setActive(conn.id);
+            return true;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const removeConnection = (id: string) => {
+        const next = connections.filter((c) => c.id !== id);
+        setConnections(next);
+        persist(next);
+        if (activeId === id) {
+            setActive(next.length > 0 ? next[0].id : null);
+        }
+    };
+
+    const clearAllValues = () => {
+        setConnections([]);
+        setActive(null);
+        localStorage.removeItem(STORAGE_CONNECTIONS);
+    };
+
+    const activeConnection = useMemo(
+        () =>
+            activeId && activeId !== "all"
+                ? connections.find((c) => c.id === activeId) ?? null
+                : null,
+        [activeId, connections]
+    );
+    const isAllMode = activeId === "all";
+
+    const value: UserContextValue = {
+        isAuthenticated: connections.length > 0,
+        isLoading,
+        connections,
+        activeId,
+        activeConnection,
+        isAllMode,
+        accountId: activeConnection?.accountId ?? "",
+        zoneId: activeConnection?.zoneId ?? "",
+        accessToken: activeConnection?.accessToken ?? "",
+        domain: activeConnection?.domain ?? "",
+        destinationAddresses: activeConnection?.destinationAddresses ?? [],
+        addConnection,
+        removeConnection,
+        setActive,
+        clearAllValues,
+    };
+
+    return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

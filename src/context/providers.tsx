@@ -1,20 +1,25 @@
 'use client'
 
-import { CacheProvider } from '@chakra-ui/next-js'
-import { ChakraProvider } from '@chakra-ui/react'
+import { ThemeProvider } from 'next-themes';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
 import { UserProvider } from './UserContext';
 import CloudflareProvider from './CloudflareContext';
+import { SettingsProvider } from './SettingsContext';
 
 export function Providers({ children }: any) {
     return (
-        <CacheProvider>
-            <ChakraProvider>
-                <UserProvider>
-                    <CloudflareProvider>
-                        {children}
-                    </CloudflareProvider>
-                </UserProvider>
-            </ChakraProvider>
-        </CacheProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <TooltipProvider>
+                <SettingsProvider>
+                    <UserProvider>
+                        <CloudflareProvider>
+                            {children}
+                            <Toaster />
+                        </CloudflareProvider>
+                    </UserProvider>
+                </SettingsProvider>
+            </TooltipProvider>
+        </ThemeProvider>
     )
 }

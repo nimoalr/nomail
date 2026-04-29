@@ -1,73 +1,43 @@
-'use client'
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-import {
-    Box,
-    Container,
-    SimpleGrid,
-    Stack,
-    Text,
-    Link,
-    useColorModeValue,
-    Center,
-    HStack,
-} from '@chakra-ui/react'
-import { ReactNode } from 'react'
-import NextLink from 'next/link'
-import { GithubIcon } from '@/icons'
-
-const ListHeader = ({ children }: { children: ReactNode }) => {
+export default function Footer({ className }: { className?: string }) {
     return (
-        <Text fontWeight={'900'} fontSize={'lg'} mb={2}>
-            {children}
-        </Text>
-    )
-}
-
-export default function Footer() {
-    return (
-        <Box
-            bg={useColorModeValue('gray.50', 'gray.900')}
-            color={useColorModeValue('gray.700', 'gray.200')} mt={'28'}>
-            <Container as={Stack} maxW={'6xl'} pt={'16'} pb={'32'}>
-                <SimpleGrid
-                    templateColumns={{ sm: '1fr 1fr', md: '2fr 1fr 1fr' }}
-                    spacing={8}>
-                    <Stack spacing={2}>
-                        <Box>
-                            <Link as={NextLink} href={"/"}>
-                                <img src="/img/logo.svg" alt="x2.email" width={'130px'} />
-                            </Link>
-                        </Box>
-                        <Text fontSize={'sm'}>
-                            Minimalistic disposable email management
-                        </Text>
-                    </Stack>
-                    <Stack align={'flex-start'}>
-                        <ListHeader>About</ListHeader>
-                        <Link href="/faq" as={NextLink}>
-                            FAQ
-                        </Link>
-                        <Link as={NextLink} href={"https://github.com/jessetinell/x2.email"} isExternal={true}>
-                            <HStack spacing={1} >
-                                <GithubIcon />
-                                <Text>Github</Text>
-                            </HStack>
-                        </Link>
-                    </Stack>
-                    <Stack align={'flex-start'}>
-                        <ListHeader>Contact</ListHeader>
-                        <Link as={NextLink} href="mailto:feedback@x2.email">
-                            <span><b>feedback</b>@x2.email</span>
-                        </Link>
-                        <Link as={NextLink} href="mailto:contact@x2.email">
-                            <span><b>contact</b>@x2.email</span>
-                        </Link>
-                    </Stack>
-                </SimpleGrid>
-            </Container>
-            <Center py={10} color={'gray.600'}>
-                x2.email is not affiliated with Cloudflare
-            </Center>
-        </Box >
-    )
+        <footer
+            className={cn(
+                "border-t bg-background/60 backdrop-blur-sm",
+                className
+            )}
+        >
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-6 py-4 text-xs lowercase text-muted-foreground">
+                <p>
+                    fork of{" "}
+                    <Link
+                        href="https://github.com/jessetinell/x2.email"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium text-foreground underline underline-offset-4 hover:text-purple-400"
+                    >
+                        x2.email
+                    </Link>{" "}
+                    made by{" "}
+                    <Link
+                        href="https://nimoa.fr"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium text-foreground underline underline-offset-4 hover:text-purple-400"
+                    >
+                        nimoa
+                    </Link>
+                </p>
+                <span aria-hidden="true">·</span>
+                <Link
+                    href="/faq"
+                    className="font-medium text-foreground underline underline-offset-4 hover:text-purple-400"
+                >
+                    faq
+                </Link>
+            </div>
+        </footer>
+    );
 }

@@ -1,26 +1,17 @@
-import { Heading as ChakraHeading } from "@chakra-ui/react";
+import { cn } from "@/lib/utils";
 
-const H1 = ({ children, as, ...props }: any) => (
-  <ChakraHeading as={'h1'} fontSize={["3xl", "6xl"]} fontWeight={'900'} {...props}>
-    {children}
-  </ChakraHeading>
+type HeadingProps = React.HTMLAttributes<HTMLHeadingElement>;
+
+const H1 = ({ className, ...props }: HeadingProps) => (
+  <h1 className={cn("text-3xl font-black sm:text-6xl", className)} {...props} />
 );
 
-
-const H2 = ({ children, as, ...props }: any) => (
-  <ChakraHeading as={'h2'} fontSize={["3xl", "5xl"]} fontWeight={'900'} {...props}>
-    {children}
-  </ChakraHeading>
+const H2 = ({ className, ...props }: HeadingProps) => (
+  <h2 className={cn("text-3xl font-black sm:text-5xl", className)} {...props} />
 );
 
-const H3 = ({ children, as, ...props }: any) => (
-  <ChakraHeading as={'h3'} fontSize={["2xl", "3xl"]} fontWeight={'900'} {...props}>
-    {children}
-  </ChakraHeading>
+const H3 = ({ className, ...props }: HeadingProps) => (
+  <h3 className={cn("text-2xl font-black sm:text-3xl", className)} {...props} />
 );
 
-export {
-  H1,
-  H2,
-  H3,
-}
+export { H1, H2, H3 };

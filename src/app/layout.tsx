@@ -1,18 +1,16 @@
 import type { Metadata } from 'next'
-import { Poppins } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Providers } from "@/context/providers";
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
-import '../css/base.scss'
+import './globals.css'
+import { cn } from "@/lib/utils";
 
-const font = Poppins({ weight: ["400", "700", "900"], subsets: ['latin'] })
+const geist = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'x2.email',
-  description: 'x2.email is a free email forwarding service that allows you to create unlimited email aliases for your domain.',
+  title: 'nomail',
+  description: 'Create unique email addresses for each of your accounts. No more spam.',
 }
-
 
 export default function RootLayout({
   children,
@@ -20,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -30,11 +28,9 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
       </head>
-      <body className={font.className} suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true}>
         <Providers>
-          <Header />
           {children}
-          <Footer />
         </Providers>
       </body>
     </html>

@@ -8,6 +8,8 @@ export type CustomAddress = {
     from: string;
     to: string;
     enabled: boolean;
+    connectionId?: string;
+    domain?: string;
 }
 
 export interface RouteProps {
