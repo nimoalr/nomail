@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .bg { fill: #ffffff; }
+    .fg { fill: #000000; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #000000; }
+      .fg { fill: #ffffff; }
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="6"/>
+  <text class="fg" x="16" y="24" text-anchor="middle" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" letter-spacing="-1.2">n</text>
+</svg>

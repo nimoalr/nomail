@@ -35,8 +35,12 @@ export default function Page() {
     const setLength = (v: number) =>
         updateSettings({ randomSuffix: { ...settings.randomSuffix, length: v } });
 
-    const previewSuffix = generateSuffix(length);
-    const preview = enabled
+    const [previewSuffix, setPreviewSuffix] = useState("");
+    useEffect(() => {
+        setPreviewSuffix(generateSuffix(length));
+    }, [length]);
+
+    const preview = enabled && previewSuffix
         ? `service-${previewSuffix}@yourdomain.com`
         : `service@yourdomain.com`;
 
