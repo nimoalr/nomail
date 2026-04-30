@@ -15,8 +15,8 @@ This project is a fork of [x2.email](https://github.com/jessetinell/x2.email) by
 
 ## Tech stack
 
-- Next.js 14 (App Router)
-- React 18 + TypeScript
+- Next.js 16 (App Router)
+- React 19 + TypeScript
 - Tailwind CSS v4
 - shadcn/ui (built on [Base UI](https://base-ui.com))
 - lucide-react, sonner, next-themes
@@ -44,7 +44,14 @@ Open [http://localhost:3000](http://localhost:3000) and paste your Account ID, Z
 
 ### Deploy
 
-The app is a standard Next.js 14 project. Build with `npm run build` and serve with `npm start`, or deploy to any host that supports Next.js.
+The app is a standard Next.js 16 project, deployable on any Next.js host.
+
+For Cloudflare Workers, the repo ships with [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Hook the GitHub repo to Cloudflare Workers Builds and use:
+
+- **Build command**: `npx opennextjs-cloudflare build`
+- **Deploy command**: `npx opennextjs-cloudflare deploy`
+
+Or run `npm run deploy` locally after `npx wrangler login`.
 
 ## Project layout
 

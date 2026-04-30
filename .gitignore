@@ -130,3 +130,9 @@ dist
 # Claude Code
 .claude/
 .mcp.json
+
+# OpenNext / Cloudflare
+.open-next/
+.wrangler/
+.dev.vars
+cloudflare-env.d.ts
