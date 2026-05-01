@@ -65,10 +65,6 @@ src/
 └── utils/               Encryption helpers and shared utilities
 ```
 
-## Contributing
-
-Issues and PRs welcome. Run `npx tsc --noEmit` before opening a PR.
-
 ## License
 
 MIT, same as the upstream project.
