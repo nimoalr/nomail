@@ -37,6 +37,15 @@ export default function Footer({ className }: { className?: string }) {
                 >
                     faq
                 </Link>
+                <span aria-hidden="true">·</span>
+                <Link
+                    href="https://github.com/nimoalr/nomail"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-foreground underline underline-offset-4 hover:text-purple-400"
+                >
+                    github
+                </Link>
             </div>
         </footer>
     );
