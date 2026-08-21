@@ -39,6 +39,6 @@
     "tailwindcss": "^4.2.4",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.1.6",
-    "wrangler": "^4.86.0"
+    "wrangler": "^4.125.0"
   }
 }
